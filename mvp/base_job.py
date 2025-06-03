@@ -1,7 +1,7 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from mvp.config import League
+from mvp.config import League, ORDINAL_MAP
 
 
 class BaseJob:
@@ -13,7 +13,7 @@ class BaseJob:
                 f"Invalid league: {league}. "
                 f"Supported leagues: {', '.join(lg for lg in League)}"
             )
-        self.league = league
+        self.league = league.lower()
         self.run_datetime = datetime.now(ZoneInfo("America/Chicago"))
         self.run_datetime_iso = self.run_datetime.isoformat()
         self.run_date = self.run_datetime.strftime("%Y-%m-%d")
@@ -26,3 +26,20 @@ class BaseJob:
                 f"Invalid date format: {game_date}. "
                 "Expected format: YYYY-MM-DD"
             )
+
+    def normalize_period(self, raw: str) -> str:
+        """
+        Normalize period strings to consistent format, replacing any ordinal
+        indicators and hyphens.
+
+        ex. "1st-half" -> "first_half", "2nd-quarter" -> "second_quarter"
+
+        :param raw: The raw period string to normalize.
+        :return: Normalized period string with ordinals and hyphens replaced
+        """
+
+        for ord_key, word in ORDINAL_MAP.items():
+            if raw.startswith(ord_key):
+                return raw.replace(ord_key, word).replace('-', '_')
+
+        return raw.replace('-', '_')
