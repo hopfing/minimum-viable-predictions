@@ -1,7 +1,7 @@
 import unittest
 
-from mvp.config import League
-from mvp.sportsbookreview.base_sbr import SBRBase, SBRLeague, SBRPeriod
+from mvp.sportsbookreview import SBRBase
+from mvp.sportsbookreview.sbr_config import SBRLeague, SBRPeriod
 
 
 class TestSBRBase(unittest.TestCase):
@@ -21,13 +21,12 @@ class TestSBRBase(unittest.TestCase):
     def test_empty_url_path(self):
         with self.assertRaises(ValueError):
             SBRLeague(
-                name=League.MLB, url_path='', periods=[SBRPeriod.FULL_GAME]
+                url_path='', periods=[SBRPeriod.FULL_GAME]
             )
 
     def test_invalid_period_value_raises(self):
         with self.assertRaises(ValueError):
             SBRLeague(
-                name=League.MLB,
                 url_path='mlb-baseball',
                 periods=['5th-period']
             )

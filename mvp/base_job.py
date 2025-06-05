@@ -5,15 +5,23 @@ from mvp.config import League, ORDINAL_MAP
 
 
 class BaseJob:
-    def __init__(self, league: str, game_date: str = None):
-        try:
-            League(league.lower())
-        except ValueError:
-            raise ValueError(
-                f"Invalid league: {league}. "
-                f"Supported leagues: {', '.join(lg for lg in League)}"
+    def __init__(self, league: str | League, game_date: str = None):
+        if isinstance(league, str):
+            try:
+                league_num = League(league.lower())
+            except ValueError:
+                raise ValueError(
+                    f"Invalid league: {league}. "
+                    f"Supported leagues: {', '.join(lg for lg in League)}"
+                )
+        elif isinstance(league, League):
+            league_num = league
+        else:
+            raise TypeError(
+                f"Expected league to be str or League enum, got {type(league)}"
             )
-        self.league = league.lower()
+
+        self.league = league_num
         self.run_datetime = datetime.now(ZoneInfo("America/Chicago"))
         self.run_datetime_iso = self.run_datetime.isoformat()
         self.run_date = self.run_datetime.strftime("%Y-%m-%d")
